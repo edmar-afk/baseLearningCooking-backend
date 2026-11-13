@@ -4,7 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import UserExtraInfo, Quizzes, QuestionsAndAnswers, Lessons, LessonVideos, Presentation
+from .models import UserExtraInfo, Quizzes, QuestionsAndAnswers, Lessons, LessonVideos, Presentation, LessonProgress
 
 User = get_user_model()
 
@@ -251,3 +251,24 @@ class PresentationSerializer(serializers.ModelSerializer):
         url = obj.file.url
 
         return request.build_absolute_uri(url) if request else url
+
+
+
+class LessonProgressSerializer(serializers.ModelSerializer):
+    lesson_title = serializers.CharField(source="lesson.title", read_only=True)
+    completed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = LessonProgress
+        fields = [
+            "id",
+            "lesson",
+            "lesson_title",
+            "progress_percent",
+            "completed",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "lesson_title", "completed", "updated_at"]
+
+    def get_completed(self, obj):
+        return obj.progress_percent >= 100

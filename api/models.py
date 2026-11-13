@@ -134,3 +134,40 @@ class Presentation(models.Model):
 
     class Meta:
         ordering = ["-uploaded_at"]
+        
+        
+        
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+class LessonProgress(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="lesson_progress_records",
+    )
+    lesson = models.ForeignKey(
+        Lessons,
+        on_delete=models.CASCADE,
+        related_name="student_progress_records",
+    )
+    progress_percent = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "lesson"],
+                name="unique_student_lesson_progress",
+            )
+        ]
+
+    @property
+    def completed(self):
+        return self.progress_percent >= 100
+
+    def __str__(self):
+        return f"{self.user.username} - {self.lesson_id}: {self.progress_percent}%"        

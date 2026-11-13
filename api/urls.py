@@ -23,5 +23,8 @@ urlpatterns = [
     
     path("presentations/", views.PresentationListCreateView.as_view(), name="presentation-list-create"),
     path("presentations/<int:pk>/", views.PresentationDetailView.as_view(), name="presentation-detail"),
+    
+    path("teacher/students-progress/",views.TeacherStudentsProgressView.as_view(),name="teacher-students-progress",),
+    path("lesson-progress/",views.MyLessonProgressView.as_view(),name="my-lesson-progress",),
 
 ]
